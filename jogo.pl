@@ -255,8 +255,11 @@ test(j7x7, [nondet, Blocos = Final]) :-
 %  TODO: adicionar os exemplos
 
 blocos_adequados(Jogo) :-
-    % TODO: implementar
-    fail.
+    jogo(L, C, Blocos) = Jogo,
+    jogo_borda(Jogo, L, C),
+    forall(bloco_adequado(Jogo, P), true).
+
+
 
 
 %% blocos_adequados(?Jogo, ?P) is semidet
@@ -264,8 +267,60 @@ blocos_adequados(Jogo) :-
 %  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos), e o bloco na posição
 %  P de Blocos está em uma posição adequada.
 %
-%  TODO: adicionar os exemplos
+%  Exemplos para o predicado blocos_adequados/2:
+:- begin_tests(blocos_adequados).
+
+test(block_with_elements) :-
+    blocos_adequados([1, 2, 3]),
+    !.
+
+test(empty_block_fails) :-
+    \+ blocos_adequados([]),
+    !.
+
+test(single_element_block_fails) :-
+    \+ blocos_adequados([1]),
+    !.
+
+:- end_tests(blocos_adequados).
 
 bloco_adequado(Jogo, P) :-
-    % TODO: implementar
-    fail.
+    posicao_bloco(Jogo, P, bloco(T, R, B, L)),
+    borda_superior_adjacente(Jogo, P, T),
+    borda_direita_adjacente(Jogo, P, R),
+    borda_inferior_adjacente(Jogo, P, B),
+    borda_esquerda_adjacente(Jogo, P, L).
+
+
+borda_direita_adjacente(Jogo, P, Borda) :-
+    posicao_bloco(Jogo, P, bloco(_, R, _, _)),
+    posicao_bloco(Jogo, P, bloco(_, R, _, _)).
+
+borda_esquerda_adjacente(Jogo, P, Borda) :-
+    posicao_bloco(Jogo, P, bloco(_, _, E, _)),
+    posicao_bloco(Jogo, P, bloco(_, _, E, _)).
+
+borda_inferior_adjacente(Jogo, P, Borda) :-
+    posicao_bloco(Jogo, P, bloco(_, _, _, B)),
+    posicao_bloco(Jogo, P, bloco(_, _, _, B)).
+
+borda_superior_adjacente(Jogo, P, Borda) :-
+    posicao_bloco(Jogo, P, bloco(T, _, _, _)),
+    posicao_bloco(Jogo, P, bloco(T, _, _, _)).
+
+
+    
+
+
+%% posicao_bloco(+Jogo, +P, -Bloco) is semidet
+%
+%  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos), P é um número
+%  inteiro não negativo e Bloco é o bloco na posição P de Blocos.
+posicao_bloco(Jogo, P, bloco(T, R, B, L)) :-
+    jogo(L, C, Blocos) = Jogo,
+    nth0(P, Blocos, bloco(T, R, B, L)).
+
+jogo_borda(Jogo, Linhas, Colunas):-
+    jogo(Linhas, Colunas, Blocos) = Jogo,
+    Tam is Linhas * Colunas,
+    length(Blocos, Tam),
