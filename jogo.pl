@@ -37,16 +37,10 @@
 %  Blocos e estão em posições adequadas.
 
 jogo_solucao(JogoInicial, JogoFinal) :-
-    % TODO: fazer uma versão eficiente.
-    %
-    %  Dica: Implemente inicialmente o predicado bloco_adequado e depois
-    %  blocos_adequados. Crie predicados auxiliares se necessário. Depois que o
-    %  predicado jogo_solucao estiver funcionando, faça uma nova implementação
-    %  eficiente dele.
     jogo(L, C, Blocos) = JogoInicial,
     jogo(L, C, Solucao) = JogoFinal,
-    permutation(Blocos, Solucao),
-    blocos_adequados(JogoFinal).
+    blocos_adequados(JogoFinal),
+    permutation(Blocos, Solucao).
 
 
 :- begin_tests(pequeno).
@@ -253,14 +247,33 @@ test(j7x7, [nondet, Blocos = Final]) :-
 %  Blocos estão em posições adequadas.
 %
 %  TODO: adicionar os exemplos
+:- begin_tests(blocos_adequados).
+
+test(blocos_adequados_1) :-
+    jogo(1, 1, [bloco(3, 6, 7, 5)]) = Jogo,
+    blocos_adequados(Jogo).
+
+test(blocos_adequados_2) :-
+    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    blocos_adequados(Jogo).
+
+test(blocos_adequados_3) :-
+    jogo(3, 3, [bloco(7, 3, 4, 9), bloco(3, 4, 8, 3), bloco(7, 4, 2, 4), bloco(4, 4, 8, 5), bloco(8, 3, 6, 4), bloco(2, 2, 7, 3), bloco(8, 9, 1, 3), bloco(6, 6, 6, 9), bloco(7, 8, 5, 6)]) = Jogo,
+    blocos_adequados(Jogo).
+
+:- end_tests(blocos_adequados).
 
 blocos_adequados(Jogo) :-
-    jogo(L, C, Blocos) = Jogo,
-    jogo_borda(Jogo, L, C),
-    forall(bloco_adequado(Jogo, P), true).
+    Jogo = jogo(_, _, Blocos),
+    length(Blocos, Tam),
+    blocos_adequados(Jogo, Tam, 0).
 
-
-
+blocos_adequados(Jogo, Tamanho, P) :-
+    P >= Tamanho;
+    bloco_adequado(Jogo, P),
+    P1 is P + 1,
+    blocos_adequados(Jogo, Tamanho, P1),
+    !.
 
 %% blocos_adequados(?Jogo, ?P) is semidet
 %
@@ -268,59 +281,197 @@ blocos_adequados(Jogo) :-
 %  P de Blocos está em uma posição adequada.
 %
 %  Exemplos para o predicado blocos_adequados/2:
-:- begin_tests(blocos_adequados).
+:- begin_tests(bloco_adequado).
 
-test(block_with_elements) :-
-    blocos_adequados([1, 2, 3]),
-    !.
+test(bloco_adequado_1) :-
+    jogo(1, 1, [bloco(3, 6, 7, 5)]) = Jogo,
+    bloco_adequado(Jogo, 0).
 
-test(empty_block_fails) :-
-    \+ blocos_adequados([]),
-    !.
+test(bloco_adequado_2) :-
+    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    bloco_adequado(Jogo, 0),
+    bloco_adequado(Jogo, 1),
+    bloco_adequado(Jogo, 2),
+    bloco_adequado(Jogo, 3).
 
-test(single_element_block_fails) :-
-    \+ blocos_adequados([1]),
-    !.
+test(bloco_adequado_3) :-
+    jogo(3, 3, [bloco(7, 3, 4, 9), bloco(3, 4, 8, 3), bloco(7, 4, 2, 4), bloco(4, 4, 8, 5), bloco(8, 3, 6, 4), bloco(2, 2, 7, 3), bloco(8, 9, 1, 3), bloco(6, 6, 6, 9), bloco(7, 8, 5, 6)]) = Jogo,
+    bloco_adequado(Jogo, 0),
+    bloco_adequado(Jogo, 1),
+    bloco_adequado(Jogo, 2),
+    bloco_adequado(Jogo, 3),
+    bloco_adequado(Jogo, 4),
+    bloco_adequado(Jogo, 5),
+    bloco_adequado(Jogo, 6),
+    bloco_adequado(Jogo, 7),
+    bloco_adequado(Jogo, 8).
 
-:- end_tests(blocos_adequados).
+:- end_tests(bloco_adequado).
 
 bloco_adequado(Jogo, P) :-
-    posicao_bloco(Jogo, P, bloco(T, R, B, L)),
-    borda_superior_adjacente(Jogo, P, T),
-    borda_direita_adjacente(Jogo, P, R),
-    borda_inferior_adjacente(Jogo, P, B),
-    borda_esquerda_adjacente(Jogo, P, L).
+    borda_esquerda_adequada(Jogo, P),
+    borda_superior_adequada(Jogo, P).
+
+%% borda_esquerda_adequada(+Jogo, +P, +Borda) is semidet
+%
+%  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos), P é um número inteiro
+%  não negativo que representa uma posição de Blocos, e Borda é um número
+%  inteiro que representa a borda esquerda de um bloco, e a borda esquerda do
+%  bloco na posição P é igual a Borda ou a borda direita do bloco na posição
+%  P - 1 é igual a Borda.
+
+:- begin_tests(borda_esquerda_adequada).
+
+test(borda_esquerda_adequada_1) :-
+    jogo(1, 1, [bloco(3, 6, 7, 5)]) = Jogo,
+    borda_esquerda_adequada(Jogo, 0),
+    !.
+
+test(borda_esquerda_adequada_2) :-
+    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    borda_esquerda_adequada(Jogo, 0),
+    borda_esquerda_adequada(Jogo, 1),
+    borda_esquerda_adequada(Jogo, 2),
+    borda_esquerda_adequada(Jogo, 3),
+    !.
+
+:- end_tests(borda_esquerda_adequada).
+
+borda_esquerda_adequada(Jogo, P) :-
+    limite_esquerda(Jogo, P),
+    !.
+
+borda_esquerda_adequada(Jogo, P) :-
+    Esquerda is P - 1,
+    posicao_bloco(Jogo, P, B1),
+    posicao_bloco(Jogo, Esquerda, B2),
+    bloco(_, _, _, R) = B1,
+    bloco(_, R, _, _) = B2.
+
+%% borda_superior_adequada(+Jogo, +P, +Borda) is semidet
+%
+%  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos), P é um número inteiro
+%  não negativo que representa uma posição de Blocos, e Borda é um número
+%  inteiro que representa a borda superior de um bloco, e a borda superior do
+%  bloco na posição P é igual a Borda ou a borda inferior do bloco na posição
+%  P - C é igual a Borda.
+
+:- begin_tests(borda_superior_adequada).
+
+test(borda_superior_adequada_1) :-
+    jogo(1, 1, [bloco(3, 6, 7, 5)]) = Jogo,
+    borda_superior_adequada(Jogo, 0),
+    !.
+
+test(borda_superior_adequada_2) :-
+    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    borda_superior_adequada(Jogo, 0),
+    borda_superior_adequada(Jogo, 1),
+    borda_superior_adequada(Jogo, 2),
+    borda_superior_adequada(Jogo, 3),
+    !.
+
+:- end_tests(borda_superior_adequada).
+
+borda_superior_adequada(Jogo, P) :-
+    limite_acima(Jogo, P),
+    !.
+
+borda_superior_adequada(Jogo, P) :-
+    jogo(_, C, _) = Jogo,
+    Cima is P - C,
+    posicao_bloco(Jogo, P, B1),
+    posicao_bloco(Jogo, Cima, B2),
+    bloco(U, _, _, _) = B1,
+    bloco(_, _, U, _) = B2.
+
+%% limite_esquerda(+Jogo, +P) is semidet
+%
+%  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos) e P é um número
+%  inteiro não negativo que representa uma posição de Blocos, e P está na
+%  borda esquerda do Jogo.
+
+:- begin_tests(limite_esquerda).
+
+test(limite_esquerda_1) :-
+    jogo(1, 1, [bloco(3, 6, 7, 5)]) = Jogo,
+    limite_esquerda(Jogo, 0).
+
+test(limite_esquerda_2) :-
+    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    limite_esquerda(Jogo, 0),
+    limite_esquerda(Jogo, 2).
+
+:- end_tests(limite_esquerda).
+
+limite_esquerda(Jogo, P) :-
+    jogo(_, C, _) = Jogo,
+    0 is mod(P, C).
 
 
-borda_direita_adjacente(Jogo, P, Borda) :-
-    posicao_bloco(Jogo, P, bloco(_, R, _, _)),
-    posicao_bloco(Jogo, P, bloco(_, R, _, _)).
+%% limite_acima(+Jogo, +P) is semidet
+%
+%  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos) e P é um número
+%  inteiro não negativo que representa uma posição de Blocos, e P está na
+%  borda superior do Jogo.
 
-borda_esquerda_adjacente(Jogo, P, Borda) :-
-    posicao_bloco(Jogo, P, bloco(_, _, E, _)),
-    posicao_bloco(Jogo, P, bloco(_, _, E, _)).
+:- begin_tests(limite_acima).
 
-borda_inferior_adjacente(Jogo, P, Borda) :-
-    posicao_bloco(Jogo, P, bloco(_, _, _, B)),
-    posicao_bloco(Jogo, P, bloco(_, _, _, B)).
+test(limite_acima_1) :-
+    jogo(1, 1, [bloco(3, 6, 7, 5)]) = Jogo,
+    limite_acima(Jogo, 0).
 
-borda_superior_adjacente(Jogo, P, Borda) :-
-    posicao_bloco(Jogo, P, bloco(T, _, _, _)),
-    posicao_bloco(Jogo, P, bloco(T, _, _, _)).
+test(limite_acima_2) :-
+    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    limite_acima(Jogo, 0),
+    limite_acima(Jogo, 1).
 
+:- end_tests(limite_acima).
 
-    
-
+limite_acima(Jogo, P) :-
+    jogo(_, C, _) = Jogo,
+    P < C.
 
 %% posicao_bloco(+Jogo, +P, -Bloco) is semidet
 %
 %  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos), P é um número
 %  inteiro não negativo e Bloco é o bloco na posição P de Blocos.
-posicao_bloco(Jogo, P, bloco(T, R, B, L)) :-
-    jogo(L, C, Blocos) = Jogo,
-    nth0(P, Blocos, bloco(T, R, B, L)).
 
-jogo_borda(Jogo, Linhas, Colunas):-
-    jogo(Linhas, Colunas, Blocos) = Jogo,
-    Tam is Linhas * Colunas,
-    length(Blocos, Tam),
+%% posicao_bloco(+Jogo, +P, -Bloco) is semidet
+%
+%  Verdadeiro se Jogo é uma estrutura jogo(L, C, Blocos), P é um número
+%  inteiro não negativo e Bloco é o bloco na posição P de Blocos.
+
+:- begin_tests(posicao_bloco).
+
+test(posicao_bloco_1) :-
+    jogo(1, 1, [bloco(3, 6, 7, 5)]) = Jogo,
+    posicao_bloco(Jogo, 0, bloco(3, 6, 7, 5)),
+    !.
+
+test(posicao_bloco_2) :-
+    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    posicao_bloco(Jogo, 0, bloco(3, 4, 7, 9)),
+    posicao_bloco(Jogo, 1, bloco(6, 9, 5, 4)),
+    posicao_bloco(Jogo, 2, bloco(7, 6, 5, 2)),
+    posicao_bloco(Jogo, 3, bloco(5, 3, 1, 6)),
+    !.
+
+test(posicao_bloco_3) :-
+    jogo(3, 3, [bloco(7, 3, 4, 9), bloco(3, 4, 8, 3), bloco(7, 4, 2, 4), bloco(4, 4, 8, 5), bloco(8, 3, 6, 4), bloco(2, 2, 7, 3), bloco(8, 9, 1, 3), bloco(6, 6, 6, 9), bloco(7, 8, 5, 6)]) = Jogo,
+    posicao_bloco(Jogo, 0, bloco(7, 3, 4, 9)),
+    posicao_bloco(Jogo, 1, bloco(3, 4, 8, 3)),
+    posicao_bloco(Jogo, 2, bloco(7, 4, 2, 4)),
+    posicao_bloco(Jogo, 3, bloco(4, 4, 8, 5)),
+    posicao_bloco(Jogo, 4, bloco(8, 3, 6, 4)),
+    posicao_bloco(Jogo, 5, bloco(2, 2, 7, 3)),
+    posicao_bloco(Jogo, 6, bloco(8, 9, 1, 3)),
+    posicao_bloco(Jogo, 7, bloco(6, 6, 6, 9)),
+    posicao_bloco(Jogo, 8, bloco(7, 8, 5, 6)),
+    !.
+
+:- end_tests(posicao_bloco).
+
+posicao_bloco(Jogo, P, bloco(Cima, Direita, Baixo, Esquerda)) :-
+    jogo(_, _, Blocos) = Jogo,
+    nth0(P, Blocos, bloco(Cima, Direita, Baixo, Esquerda)).
