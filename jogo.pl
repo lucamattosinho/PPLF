@@ -24,8 +24,37 @@
 % |4   6|  é representado por bloco(3, 6, 7, 4).
 % |  7  |
 %
-% Dizemos que um bloco está em posição adequada se ...
-% TODO: completar a descrição!
+% Dizemos que um bloco está em posição adequada se as bordas de seus blocos
+% adjacentes são iguais ou se não há outro bloco adjacente a esta borda. 
+% Por exemplo, no jogo abaixo:
+%
+% |  3  |  |  1  |
+% |4   6|  |6   9|
+% |  7  |  |  3  |
+%
+% |  7  |  |  5  |
+% |3   1|  |1   6|
+% |  7  |  |  4  |
+%
+% O bloco 0 está em posição adequada, pois todos os blocos adjacentes tem
+% bordas iguais. O bloco 1 não está em posição adequada, pois sua borda inferior
+% é diferente da borda superior do bloco 3. O bloco 2 está em posição adequada,
+% pois todos os blocos adjacentes tem bordas iguais. O bloco 3 não está em
+% posição adequada, pois a borda superior é diferente da borda inferior do
+% bloco 1.
+%
+% Além disso, é possível perceber que não é necessário verificar todas as
+% bordas de um bloco para saber se ele está em posição adequada. Se verificarmos
+% apenas as bordas superior e esquerda, já é possível saber se um bloco está
+% em posição adequada. Isso porque a verificação das bordas inferior e direita
+% de um bloco é feita quando verificamos as bordas superior e esquerda dos
+% blocos adjacentes.
+%
+% Dessa forma, para verificar se um bloco está em posição adequada, basta
+% verificar se as bordas superior e esquerda do bloco são iguais as bordas
+% inferior e direita dos blocos adjacentes. Em outra possibilidade, se não 
+% houver um bloco adjacente a uma borda, então a borda é considerada adequada.
+
 
 
 
@@ -36,12 +65,12 @@
 %  JogoInicial, isto é, os blocos que aparecem em Solucao são os mesmos de
 %  Blocos e estão em posições adequadas.
 %
-% Para melhorar o desempenho do algoritmo, foi invertida a ordem de 
-% blocos_adequados e permutation. Isso porque permutar uma lista de
-% blocos é muito mais custoso do que a verificar se os blocos estão em
-% posições adequadas. Dessa forma, a verificação de blocos_adequados é feita
-% antes da permutação, evitando que a permutação seja feita em listas que
-% não são soluções válidas.
+%  Para melhorar o desempenho do algoritmo, foi invertida a ordem de 
+%  blocos_adequados e permutation. Isso porque permutar uma lista de
+%  blocos é muito mais custoso do que a verificar se os blocos estão em
+%  posições adequadas. Dessa forma, a verificação de blocos_adequados é feita
+%  antes da permutação, evitando que a permutação seja feita em listas que
+%  não são soluções válidas.
 
 jogo_solucao(JogoInicial, JogoFinal) :-
     jogo(L, C, Blocos) = JogoInicial,
