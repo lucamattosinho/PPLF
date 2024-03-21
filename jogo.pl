@@ -309,6 +309,12 @@ test(blocos_adequados_3) :-
                 bloco(7, 8, 5, 6)]) = Jogo,
     blocos_adequados(Jogo).
 
+test(blocos_adequados_4) :-
+    jogo(1, 3, [bloco(7, 7, 4, 8),
+                bloco(3, 0, 2, 7),
+                bloco(7, 9, 1, 0)]) = Jogo,
+    blocos_adequados(Jogo).
+
 :- end_tests(blocos_adequados).
 
 blocos_adequados(Jogo) :-
@@ -348,6 +354,13 @@ test(all_blocos_adequados_3) :-
                 bloco(6, 6, 6, 9), 
                 bloco(7, 8, 5, 6)]) = Jogo,
     all_blocos_adequados(Jogo, 9, 0).
+
+test(all_blocos_adequados_4) :-
+    jogo(4, 1, [bloco(7, 7, 4, 8),
+                bloco(4, 0, 2, 7),
+                bloco(2, 9, 4, 0),
+                bloco(4, 2, 2, 2)]) = Jogo,
+    all_blocos_adequados(Jogo, 3, 0).
 
 :- end_tests(all_blocos_adequados).
 
@@ -404,6 +417,14 @@ test(bloco_adequado_3) :-
     bloco_adequado(Jogo, 7),
     bloco_adequado(Jogo, 8).
 
+test(bloco_adequado_4) :-
+    jogo(4, 1, [bloco(7, 7, 4, 8),
+                bloco(4, 0, 2, 7),
+                bloco(2, 9, 4, 0)]) = Jogo,
+    bloco_adequado(Jogo, 0),
+    bloco_adequado(Jogo, 1),
+    bloco_adequado(Jogo, 2).
+
 :- end_tests(bloco_adequado).
 
 bloco_adequado(Jogo, P) :-
@@ -453,6 +474,18 @@ test(borda_esquerda_adequada_3) :-
     borda_esquerda_adequada(Jogo, 6),
     borda_esquerda_adequada(Jogo, 7),
     borda_esquerda_adequada(Jogo, 8),
+    !.
+
+test(borda_esquerda_adequada_4) :-
+    jogo(2, 3, [bloco(7, 7, 4, 8),
+                bloco(4, 0, 2, 7),
+                bloco(2, 9, 4, 0),
+                bloco(8, 4, 5, 6),
+                bloco(2, 3, 1, 4),
+                bloco(4, 1, 0, 0)]) = Jogo,
+    borda_esquerda_adequada(Jogo, 0),
+    borda_esquerda_adequada(Jogo, 1),
+    borda_esquerda_adequada(Jogo, 2),
     !.
 
 :- end_tests(borda_esquerda_adequada).
@@ -515,6 +548,18 @@ test(borda_superior_adequada_3) :-
     borda_superior_adequada(Jogo, 8),
     !.
 
+test(borda_superior_adequada_4) :-
+    jogo(3, 2, [bloco(0, 0, 4, 0),
+                bloco(0, 0, 2, 0),
+                bloco(4, 0, 3, 0),
+                bloco(2, 0, 9, 0),
+                bloco(3, 0, 0, 0),
+                bloco(9, 0, 0, 0)]) = Jogo,
+    borda_superior_adequada(Jogo, 0),
+    borda_superior_adequada(Jogo, 1),
+    borda_superior_adequada(Jogo, 2),
+    !.
+
 :- end_tests(borda_superior_adequada).
 
 borda_superior_adequada(Jogo, P) :-
@@ -565,6 +610,27 @@ test(limite_esquerda_3) :-
     limite_esquerda(Jogo, 3),
     limite_esquerda(Jogo, 6).
 
+test(limite_esquerda_4) :-
+    jogo(9, 1, [bloco(7, 7, 4, 8),
+                bloco(4, 0, 2, 7),
+                bloco(2, 9, 4, 0),
+                bloco(4, 4, 9, 6),
+                bloco(9, 3, 1, 4),
+                bloco(1, 1, 0, 0),
+                bloco(0, 0, 1, 1),
+                bloco(1, 11, 27, 2),
+                bloco(27, 3, 1, 5)]) = Jogo,
+    limite_esquerda(Jogo, 0),
+    limite_esquerda(Jogo, 1),
+    limite_esquerda(Jogo, 2),
+    limite_esquerda(Jogo, 3),
+    limite_esquerda(Jogo, 4),
+    limite_esquerda(Jogo, 5),
+    limite_esquerda(Jogo, 6),
+    limite_esquerda(Jogo, 7),
+    limite_esquerda(Jogo, 8),
+    !.
+
 :- end_tests(limite_esquerda).
 
 
@@ -609,6 +675,30 @@ test(limite_acima_3) :-
     limite_acima(Jogo, 1),
     limite_acima(Jogo, 2).
 
+test(limite_acima_4) :-
+    jogo(9, 1, [bloco(7, 7, 4, 8),
+                bloco(4, 0, 2, 7),
+                bloco(2, 9, 4, 0),
+                bloco(4, 4, 9, 6),
+                bloco(9, 3, 1, 4),
+                bloco(1, 1, 0, 0),
+                bloco(0, 0, 1, 1),
+                bloco(1, 11, 27, 2),
+                bloco(27, 3, 1, 5)]) = Jogo,
+    limite_acima(Jogo, 0),
+    !.
+
+test(limite_acima_5) :-
+    jogo(1, 4, [bloco(4, 4, 6, 3),
+                bloco(5, 3, 3, 3),
+                bloco(0, 0, 0, 0),
+                bloco(2, 2, 2, 2)]) = Jogo,
+    limite_acima(Jogo, 0),
+    limite_acima(Jogo, 1),
+    limite_acima(Jogo, 2),
+    limite_acima(Jogo, 3),
+    !.
+
 :- end_tests(limite_acima).
 
 limite_acima(Jogo, P) :-
@@ -630,7 +720,10 @@ test(posicao_bloco_1) :-
     !.
 
 test(posicao_bloco_2) :-
-    jogo(2, 2, [bloco(3, 4, 7, 9), bloco(6, 9, 5, 4), bloco(7, 6, 5, 2), bloco(5, 3, 1, 6)]) = Jogo,
+    jogo(2, 2, [bloco(3, 4, 7, 9),
+                bloco(6, 9, 5, 4),
+                bloco(7, 6, 5, 2),
+                bloco(5, 3, 1, 6)]) = Jogo,
     posicao_bloco(Jogo, 0, bloco(3, 4, 7, 9)),
     posicao_bloco(Jogo, 1, bloco(6, 9, 5, 4)),
     posicao_bloco(Jogo, 2, bloco(7, 6, 5, 2)),
@@ -638,7 +731,15 @@ test(posicao_bloco_2) :-
     !.
 
 test(posicao_bloco_3) :-
-    jogo(3, 3, [bloco(7, 3, 4, 9), bloco(3, 4, 8, 3), bloco(7, 4, 2, 4), bloco(4, 4, 8, 5), bloco(8, 3, 6, 4), bloco(2, 2, 7, 3), bloco(8, 9, 1, 3), bloco(6, 6, 6, 9), bloco(7, 8, 5, 6)]) = Jogo,
+    jogo(3, 3, [bloco(7, 3, 4, 9), 
+                bloco(3, 4, 8, 3), 
+                bloco(7, 4, 2, 4), 
+                bloco(4, 4, 8, 5), 
+                bloco(8, 3, 6, 4), 
+                bloco(2, 2, 7, 3), 
+                bloco(8, 9, 1, 3), 
+                bloco(6, 6, 6, 9), 
+                bloco(7, 8, 5, 6)]) = Jogo,
     posicao_bloco(Jogo, 0, bloco(7, 3, 4, 9)),
     posicao_bloco(Jogo, 1, bloco(3, 4, 8, 3)),
     posicao_bloco(Jogo, 2, bloco(7, 4, 2, 4)),
